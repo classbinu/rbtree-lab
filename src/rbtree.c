@@ -1,5 +1,5 @@
 #include "rbtree.h"
-
+#include <stdio.h>
 #include <stdlib.h>
 
 rbtree *new_rbtree(void) {
@@ -13,7 +13,7 @@ rbtree *new_rbtree(void) {
   // NIL 노드를 생성합니다. 생성된 NIL 노드는 트리 내에서 계속 사용됩니다.
   node_t *nil_node = (node_t*)calloc(1, sizeof(node_t));
   if (!nil_node) {
-    pinrtf("메모리 할당에 실패하였습니다.\n");
+    printf("메모리 할당에 실패하였습니다.\n");
     free(p);
     return NULL;
   }
