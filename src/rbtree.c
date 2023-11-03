@@ -25,9 +25,10 @@ rbtree *new_rbtree(void) {
   nil_node->right = nil_node;
 
   // 트리의 멤버를 설정합니다.
-  p->root = nil_node;
+  p->root = NULL;
   p->nil = nil_node;
 
+  printf("트리를 생성하였습니다.\n");
   return p;
 }
 
