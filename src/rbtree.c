@@ -4,7 +4,7 @@
 
 rbtree *new_rbtree(void) {
   rbtree *t = (rbtree *)calloc(1, sizeof(rbtree));
-  // TODO: initialize struct if needed
+
   if (!t) {
     printf("메모리 할당에 실패하였습니다.\n");
     return NULL;
@@ -32,7 +32,7 @@ rbtree *new_rbtree(void) {
 }
 
 void delete_rbtree(rbtree *t) {
-  // TODO: reclaim the tree nodes's memory
+
   if (!t) return;
 
   // 스택 공간을 할당합니다.
@@ -52,15 +52,16 @@ void delete_rbtree(rbtree *t) {
     stack_top--;
     node_t *node = stack[stack_top];
 
-    // NIL노드가 아니면 왼쪽 노드를 스택에 push합니다.
-    if (node->left != t->nil) {
-      stack[stack_top] = node->left;
-      stack_top++;
-    }
-
+    // 오른쪽 노드를 먼저 넣어서 전위 순회를 구현합니다.
     // NIL노드가 아니면 오른쪽 노드를 스택에 push합니다.
     if (node->right != t->nil) {
       stack[stack_top] = node->right;
+      stack_top++;
+    }
+
+    // NIL노드가 아니면 왼쪽 노드를 스택에 push합니다.
+    if (node->left != t->nil) {
+      stack[stack_top] = node->left;
       stack_top++;
     }
 
