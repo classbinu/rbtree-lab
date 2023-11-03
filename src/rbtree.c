@@ -10,7 +10,7 @@ rbtree *new_rbtree(void) {
     return NULL;
   }
 
-  // NIL 노드를 생성합니다. 생성된 NIL 노드는 트리 내에서 계속 사용됩니다.
+  // T.nil을 생성합니다. 생성된 T.nil은 트리 내에서 계속 사용됩니다.
   node_t *nil_node = (node_t*)calloc(1, sizeof(node_t));
   if (!nil_node) {
     printf("메모리 할당에 실패하였습니다.\n");
@@ -18,7 +18,7 @@ rbtree *new_rbtree(void) {
     return NULL;
   }
 
-  // NIL 노드의 멤버를 설정합니다.
+  // T.nil의 멤버를 설정합니다.
   nil_node->color = RBTREE_BLACK;
   nil_node->parent = nil_node;
   nil_node->left = nil_node;
@@ -53,13 +53,13 @@ void delete_rbtree(rbtree *t) {
     node_t *node = stack[stack_top];
 
     // 오른쪽 노드를 먼저 넣어서 전위 순회를 구현합니다.
-    // NIL노드가 아니면 오른쪽 노드를 스택에 push합니다.
+    // T.nil이 아니면 오른쪽 노드를 스택에 push합니다.
     if (node->right != t->nil) {
       stack[stack_top] = node->right;
       stack_top++;
     }
 
-    // NIL노드가 아니면 왼쪽 노드를 스택에 push합니다.
+    // T.nil이 아니면 왼쪽 노드를 스택에 push합니다.
     if (node->left != t->nil) {
       stack[stack_top] = node->left;
       stack_top++;
@@ -69,7 +69,7 @@ void delete_rbtree(rbtree *t) {
     free(node);
   }
 
-  // 모든 노드를 해제 후에 마지막으로 NIL노드를 해제합니다.
+  // 모든 노드를 해제 후에 T.nil을 해제합니다.
   free(t->nil);
 
   // 트리를 해제합니다.
