@@ -5,6 +5,29 @@
 rbtree *new_rbtree(void) {
   rbtree *p = (rbtree *)calloc(1, sizeof(rbtree));
   // TODO: initialize struct if needed
+  if (!p) {
+    printf("메모리 할당에 실패하였습니다.\n");
+    return NULL;
+  }
+
+  // NIL 노드를 생성합니다. 생성된 NIL 노드는 트리 내에서 계속 사용됩니다.
+  node_t *nil_node = (node_t*)calloc(1, sizeof(node_t));
+  if (!nil_node) {
+    pinrtf("메모리 할당에 실패하였습니다.\n");
+    free(p);
+    return NULL;
+  }
+
+  // NIL 노드의 멤버를 설정합니다.
+  nil_node->color = RBTREE_BLACK;
+  nil_node->parent = nil_node;
+  nil_node->left = nil_node;
+  nil_node->right = nil_node;
+
+  // 트리의 멤버를 설정합니다.
+  p->root = nil_node;
+  p->nil = nil_node;
+
   return p;
 }
 
