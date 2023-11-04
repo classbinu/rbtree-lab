@@ -67,6 +67,7 @@ void delete_rbtree(rbtree *t) {
 
     // 꺼낸 노드를 해제합니다.
     free(node);
+    node = NULL;
   }
 
   // 모든 노드를 해제 후에 T.nil을 해제합니다.
