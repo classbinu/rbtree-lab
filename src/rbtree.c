@@ -153,7 +153,7 @@ void rbtree_insert_fixup(rbtree *t, node_t *z)
     if (z->parent == z->parent->parent->left) { // 부모가 왼쪽 자식이라면
       node_t *y = z->parent->parent->right;     // 삼촌 노드 설정
       if (y->color == RBTREE_RED) {
-        // 케이스 1: z의 삼촌 y가 레드
+        // 케이스1: z의 삼촌 y가 레드
         z->parent->color = RBTREE_BLACK; // 부모 노드를 블랙으로 설정
         y->color = RBTREE_BLACK;         // 삼촌 노드를 블랙으로 설정
         z->parent->parent->color =
@@ -161,8 +161,7 @@ void rbtree_insert_fixup(rbtree *t, node_t *z)
         z = z->parent->parent; // 레드로 설정된 조부모를 신규 삽입 노드로 취급
       } else {
         if (z == z->parent->right) {
-          // 케이스 2: z가 오른쪽 자식인 경우(케이스 2는 궁극적으로 케이스 3이
-          // 됨)
+          // 케이스2: z가 오른쪽 자식인 경우(2는 궁극적으로 케이스 3이 됨)
           z = z->parent; // 회전 기준을 z의 부모로 설정
           left_rotate(t, z);
         }
@@ -245,8 +244,21 @@ node_t *rbtree_insert(rbtree *t, const key_t key)
 
 node_t *rbtree_find(const rbtree *t, const key_t key)
 {
-  // TODO: implement find
-  return t->root;
+  node_t *current = t->root;
+
+  while (current != t->nil) { // 현재 노드가 nil이 아니면 계속 검색
+    if (key == current->key) { // 찾았음
+      return current;
+    }
+
+    if (key < current->key) {
+      current = current->left; // 좌측 탐색
+    } else {
+      current = current->right; // 우측 탐색
+    }
+  }
+  printf("일치하는 키가 없습니다.\n");
+  return NULL;
 }
 
 node_t *rbtree_min(const rbtree *t)
