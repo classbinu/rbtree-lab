@@ -216,10 +216,7 @@ node_t *rbtree_insert(rbtree *t, const key_t key)
       current = current->right;
     } else {
       // 키가 중복되었을 경우
-      printf("키가 중복되었습니다.\n");
-      free(new_node);
-      new_node = NULL;
-      return t->root;
+      current = current->right;
     }
   }
 
@@ -231,9 +228,11 @@ node_t *rbtree_insert(rbtree *t, const key_t key)
   } else if (key < parent->key) { // 신규 노드의 키가 부모의 키보다 작으면
                                   // 부모의 왼쪽 자식으로 설정
     parent->left = new_node;
-  } else {
+  } else if (key > parent->key) {
     parent->right = new_node; // 신규 노드의 키가 부모의 키보다 작으면
                               // 부모의 오른쪽 자식으로 설정
+  } else {
+    parent->right = new_node; // 중복 키라면 부모의 오른쪽 자식으로 설정
   }
 
   // RB Tree 특성 복구
