@@ -77,6 +77,63 @@ void delete_rbtree(rbtree *t) {
   free(t);
 }
 
+// 좌회전 함수
+void left_rotate(rbtree *t, node_t *x) {
+    if (x == t->nil || x->right == t->nil) {
+      return;
+    }
+
+    // y를 설정
+    node_t *y = x->right;
+
+    // y의 왼쪽 서브트리를 x의 오른쪽 서브트리로 옮긴다.
+    x->right = y->left;
+    y->left->parent = x;
+
+    // y의 부모를 x의 부모로 변경한다.(y를 부모 자리로 승격)
+    y->parent = x->parent;
+    if (x->parent == t->nil) {  // x가 루트였다면 승격된 y를 트리의 루트로 설정
+      t->root = y;
+    } else if (x == x->parent->left) {  // x가 왼쪽 자식 노드였다면 승격된 y를 기존 부모의 왼쪽 자식으로 설정
+      x->parent->left = y;
+    } else {  // // x가 오른쪽 자식 노드였다면 승격된 y를 기존 부모의 오른쪽 자식으로 설정
+      x->parent->right = y;
+    }
+
+    // 승격된 y와 강등된 x의 관계를 설정
+    y->left = x;
+    x->parent = y;
+}
+
+
+// 우회전 함수
+void right_rotate(rbtree *t, node_t *x) {
+      if (x == t->nil || x->left == t->nil) {
+      return;
+    }
+
+    // y를 설정
+    node_t *y = x->left;
+
+    // y의 오른쪽 서브트리를 x의 왼쪽 서브트리로 옮긴다.
+    x->left = y->right;
+    y->right->parent = x;
+
+    // y의 부모를 x의 부모로 변경한다.(y를 부모 자리로 승격)
+    y->parent = x->parent;
+    if (x->parent == t->nil) {  // x가 루트였다면 승격된 y를 트리의 루트로 설정
+      t->root = y;
+    } else if (x == x->parent->left) {  // x가 왼쪽 자식 노드였다면 승격된 y를 기존 부모의 왼쪽 자식으로 설정
+      x->parent->left = y;
+    } else {  // // x가 오른쪽 자식 노드였다면 승격된 y를 기존 부모의 오른쪽 자식으로 설정
+      x->parent->right = y;
+    }
+
+    // 승격된 y와 강등된 x의 관계를 설정
+    y->left = x;
+    x->parent = y;
+}
+
 node_t *rbtree_insert(rbtree *t, const key_t key) {
   // TODO: implement insert
   return t->root;
