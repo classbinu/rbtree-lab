@@ -292,7 +292,7 @@ void inorder_recursion(const node_t *node, key_t *arr, size_t *index,
 
   inorder_recursion(node->left, arr, index, nil);
   arr[(*index)] = node->key;
-  (*index)++;
+  (*index) += 100;
   inorder_recursion(node->right, arr, index, nil);
 }
 
