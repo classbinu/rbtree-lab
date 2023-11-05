@@ -284,8 +284,29 @@ int rbtree_erase(rbtree *t, node_t *p)
   return 0;
 }
 
+void inorder_recursion(const node_t *node, key_t *arr, size_t *index,
+                       const node_t *nil)
+{
+  if (node == nil)
+    return;
+
+  inorder_recursion(node->left, arr, index, nil);
+  arr[(*index)] = node->key;
+  (*index)++;
+  inorder_recursion(node->right, arr, index, nil);
+}
+
 int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n)
 {
-  // TODO: implement to_array
+  if (t == NULL || arr == NULL)
+    return -1;
+
+  size_t index = 0;
+  inorder_recursion(t->root, arr, &index, t->nil);
+
+  if (index != n) {
+    return -1;
+  }
+
   return 0;
 }

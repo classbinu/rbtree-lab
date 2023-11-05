@@ -374,7 +374,7 @@ int main(void) {
   // test_erase_root(128);
   // test_find_erase_fixed();
   // test_minmax_suite();
-  // test_to_array_suite();
+  test_to_array_suite();
   // test_distinct_values();
   // test_duplicate_values();
   // test_multi_instance();
