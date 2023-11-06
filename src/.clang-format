@@ -3,3 +3,4 @@ UseTab: Never
 IndentWidth: 2
 TabWidth: 2
 BreakBeforeBraces: Mozilla
+ColumnLimit: 0
