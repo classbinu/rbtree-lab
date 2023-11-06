@@ -248,7 +248,7 @@ node_t *rbtree_find(const rbtree *t, const key_t key)
       current = current->right; // 우측 탐색
     }
   }
-  // printf("일치하는 키가 없습니다.\n");
+  // printf("일치하는 키가 없습니다.[%d]\n", key);
   return NULL;
 }
 
@@ -272,8 +272,8 @@ node_t *rbtree_max(const rbtree *t)
 
 node_t *rbtree_min_in_subtree(rbtree *t, node_t *node)
 {
-  if (node == NULL) {
-    return NULL;
+  if (node == t->nil) {
+    return t->nil;
   }
 
   while (node->left != t->nil) {
@@ -285,8 +285,8 @@ node_t *rbtree_min_in_subtree(rbtree *t, node_t *node)
 
 node_t *rbtree_max_in_subtree(rbtree *t, node_t *node)
 {
-  if (node == NULL) {
-    return NULL;
+  if (node == t->nil) {
+    return t->nil;
   }
 
   while (node->right != t->nil) {
@@ -314,64 +314,65 @@ void rbtree_transplant(rbtree *t, node_t *u, node_t *v)
 void rbtree_erase_fixup(rbtree *t, node_t *x)
 {
   node_t *w;
-  {
-    while (x != t->root && x->color == RBTREE_BLACK) {
-      if (x == x->parent->left) { // x가 왼쪽 노드이면 오른쪽 노드를 삼촌으로 설정
-        w = x->parent->right;
-        if (w->color == RBTREE_RED) { // 케이스1. 형제 w가 적색인 경우
-          w->color = RBTREE_BLACK;
-          x->parent->color = RBTREE_RED;
-          left_rotate(t, x->parent);
-          w = x->parent->right; // 삼촌을 재설정해서 케이스 2,3,4로 변환
-        }
-        if (w->left->color == RBTREE_BLACK && w->right->color == RBTREE_BLACK) { // 케이스2
-          w->color = RBTREE_RED;
-          x = x->parent; // 이 시점에서 x가 블랙이면서 루트가 되면 루프가 종료
-        } else if (w->right->color == RBTREE_BLACK) {
-          w->left->color = RBTREE_BLACK;
-          w->color = RBTREE_RED;
-          right_rotate(t, w); // 이 시점에서 케이스4로 변환
-        }
-        // 케이스 4. 케이스2의 일부 케이스를 제외하고 궁극적으로 모든 케이스는 4로 귀결됨.
-        w->color = x->parent->color;
-        x->parent->color = RBTREE_BLACK;
-        w->right->color = RBTREE_BLACK;
+
+  while (x != t->root && x->color == RBTREE_BLACK) {
+    if (x == x->parent->left) { // x가 왼쪽 노드이면 오른쪽 노드를 삼촌으로 설정
+      w = x->parent->right;
+      if (w->color == RBTREE_RED) { // 케이스1. 형제 w가 적색인 경우
+        w->color = RBTREE_BLACK;
+        x->parent->color = RBTREE_RED;
         left_rotate(t, x->parent);
-        x = t->root;
-      } else { // x가 오른쪽 노드이면 왼쪽 노드를 삼촌으로 설정
-        w = x->parent->left;
-        if (w->color == RBTREE_RED) { // 케이스1. 형제 w가 적색인 경우
-          w->color = RBTREE_BLACK;
-          x->parent->color = RBTREE_RED;
-          right_rotate(t, x->parent);
-          w = x->parent->left; // 삼촌을 재설정해서 케이스 2,3,4로 변환
-        }
-        if (w->right->color == RBTREE_BLACK && w->left->color == RBTREE_BLACK) { // 케이스2
-          w->color = RBTREE_RED;
-          x = x->parent; // 이 시점에서 x가 블랙이면서 루트가 되면 루프가 종료
-        } else if (w->left->color == RBTREE_BLACK) {
-          w->right->color = RBTREE_BLACK;
-          w->color = RBTREE_RED;
-          left_rotate(t, w); // 이 시점에서 케이스4로 변환
-        }
-        // 케이스 4. 케이스2의 일부 케이스를 제외하고 궁극적으로 모든 케이스는 4로 귀결됨.
-        w->color = x->parent->color;
-        x->parent->color = RBTREE_BLACK;
-        w->left->color = RBTREE_BLACK;
-        right_rotate(t, x->parent);
-        x = t->root;
+        w = x->parent->right; // 삼촌을 재설정해서 케이스 2,3,4로 변환
       }
-      x->color = RBTREE_BLACK;
+      if (w->left->color == RBTREE_BLACK && w->right->color == RBTREE_BLACK) { // 케이스2
+        w->color = RBTREE_RED;
+        x = x->parent; // 이 시점에서 x가 블랙이면서 루트가 되면 루프가 종료
+      } else if (w->right->color == RBTREE_BLACK) {
+        w->left->color = RBTREE_BLACK;
+        w->color = RBTREE_RED;
+        right_rotate(t, w); // 이 시점에서 케이스4로 변환
+        w = x->parent->right;
+      }
+      // 케이스 4. 케이스2의 일부 케이스를 제외하고 궁극적으로 모든 케이스는 4로 귀결됨.
+      w->color = x->parent->color;
+      x->parent->color = RBTREE_BLACK;
+      w->right->color = RBTREE_BLACK;
+      left_rotate(t, x->parent);
+      x = t->root;
+    } else {
+      w = x->parent->left;
+      if (w->color == RBTREE_RED) { // 케이스1. 형제 w가 적색인 경우
+        w->color = RBTREE_BLACK;
+        x->parent->color = RBTREE_RED;
+        right_rotate(t, x->parent);
+        w = x->parent->left; // 삼촌을 재설정해서 케이스 2,3,4로 변환
+      }
+      if (w->right->color == RBTREE_BLACK && w->left->color == RBTREE_BLACK) { // 케이스2
+        w->color = RBTREE_RED;
+        x = x->parent; // 이 시점에서 x가 블랙이면서 루트가 되면 루프가 종료
+      } else if (w->left->color == RBTREE_BLACK) {
+        w->right->color = RBTREE_BLACK;
+        w->color = RBTREE_RED;
+        left_rotate(t, w); // 이 시점에서 케이스4로 변환
+        w = x->parent->left;
+      }
+      // 케이스 4. 케이스2의 일부 케이스를 제외하고 궁극적으로 모든 케이스는 4로 귀결됨.
+      w->color = x->parent->color;
+      x->parent->color = RBTREE_BLACK;
+      w->left->color = RBTREE_BLACK;
+      right_rotate(t, x->parent);
+      x = t->root;
     }
   }
+  x->color = RBTREE_BLACK;
 }
 
 // 이진 검색 트리 방식으로 삭제
 int rbtree_erase(rbtree *t, node_t *z)
 {
-  if (z == NULL || z == t->nil) {
-    return -1;
-  }
+  // if (z == NULL || z == t->nil) {
+  //   return -1;
+  // }
 
   node_t *y = z;
   node_t *x; // x는 삭제 연산으로 인해 부모 노드를 잃게 된 고아 노드
@@ -386,9 +387,9 @@ int rbtree_erase(rbtree *t, node_t *z)
   } else {                                  // 삭제한 노드에 모두 자녀가 있음
     y = rbtree_min_in_subtree(t, z->right); // 후계자 찾기
     y_original_color = y->color;
-    x = y->right;         // y의 왼쪽 자식은 무조건 nil이지만 오른쪽은 서브트리 존재 가능함
-    if (y->parent == z) { // 후계자가 삭제 노드의 직접 자식이라면, y는 이미 올바른 위치(y는 언제든지 떠날 준비가 되어 있음.)
-      //
+    x = y->right;                        // y의 왼쪽 자식은 무조건 nil이지만 오른쪽은 서브트리 존재 가능함
+    if (y->parent == z) {                // 후계자가 삭제 노드의 직접 자식이라면, y는 이미 올바른 위치(y는 언제든지 떠날 준비가 되어 있음.)
+      x->parent = y;                     // x는 임시 변수로, y의 오른쪽 자녀로 등록되었지만, x의 부모가 누군인지는 아직 모름. 이 시점에서 연동.
     } else {                             // y가 z를 대체하기 위해서는 y의 관계를 y의 오른쪽 자식에게 물려주고 떠나야 함.
       rbtree_transplant(t, y, y->right); // y를 y의 오른쪽 자식으로 대체
       y->right = z->right;
@@ -408,11 +409,10 @@ int rbtree_erase(rbtree *t, node_t *z)
   if (y_original_color == RBTREE_BLACK) {
     rbtree_erase_fixup(t, x);
   }
-  return 0;
+  return 1;
 }
 
-void inorder_recursion(const node_t *node, key_t *arr, size_t *index,
-                       const node_t *nil)
+void inorder_recursion(const node_t *node, key_t *arr, size_t *index, const node_t *nil)
 {
   if (node == nil)
     return;
