@@ -94,7 +94,9 @@ void left_rotate(rbtree *t, node_t *x)
 
   // y의 왼쪽 서브트리를 x의 오른쪽 서브트리로 옮긴다.
   x->right = y->left;
-  y->left->parent = x;
+  if (y->left != t->nil) {
+    y->left->parent = x;
+  }
 
   // y의 부모를 x의 부모로 변경한다.(y를 부모 자리로 승격)
   y->parent = x->parent;
@@ -102,7 +104,7 @@ void left_rotate(rbtree *t, node_t *x)
     t->root = y;
   } else if (x == x->parent->left) { // x가 왼쪽 자식 노드였다면 승격된 y를 기존 부모의 왼쪽 자식으로 설정
     x->parent->left = y;
-  } else { // // x가 오른쪽 자식 노드였다면 승격된 y를 기존 부모의 오른쪽 자식으로 설정
+  } else { // x가 오른쪽 자식 노드였다면 승격된 y를 기존 부모의 오른쪽 자식으로 설정
     x->parent->right = y;
   }
 
@@ -123,7 +125,9 @@ void right_rotate(rbtree *t, node_t *x)
 
   // y의 오른쪽 서브트리를 x의 왼쪽 서브트리로 옮긴다.
   x->left = y->right;
-  y->right->parent = x;
+  if (y->right != t->nil) {
+    y->right->parent = x;
+  }
 
   // y의 부모를 x의 부모로 변경한다.(y를 부모 자리로 승격)
   y->parent = x->parent;
@@ -136,7 +140,7 @@ void right_rotate(rbtree *t, node_t *x)
   }
 
   // 승격된 y와 강등된 x의 관계를 설정
-  y->left = x;
+  y->right = x;
   x->parent = y;
 }
 
@@ -148,11 +152,10 @@ void rbtree_insert_fixup(rbtree *t, node_t *z)
       node_t *y = z->parent->parent->right;     // 삼촌 노드 설정
       if (y->color == RBTREE_RED) {
         // 케이스1: z의 삼촌 y가 레드
-        z->parent->color = RBTREE_BLACK; // 부모 노드를 블랙으로 설정
-        y->color = RBTREE_BLACK;         // 삼촌 노드를 블랙으로 설정
-        z->parent->parent->color =
-            RBTREE_RED;        // 조부모를 레드로 설정(부모와 삼촌에게 블랙을 물려줌)
-        z = z->parent->parent; // 레드로 설정된 조부모를 신규 삽입 노드로 취급
+        z->parent->color = RBTREE_BLACK;       // 부모 노드를 블랙으로 설정
+        y->color = RBTREE_BLACK;               // 삼촌 노드를 블랙으로 설정
+        z->parent->parent->color = RBTREE_RED; // 조부모를 레드로 설정(부모와 삼촌에게 블랙을 물려줌)
+        z = z->parent->parent;                 // 레드로 설정된 조부모를 신규 삽입 노드로 취급
       } else {
         if (z == z->parent->right) {
           // 케이스2: z가 오른쪽 자식인 경우(2는 궁극적으로 케이스 3이 됨)
@@ -193,15 +196,16 @@ node_t *rbtree_insert(rbtree *t, const key_t key)
     return t->root;
   }
 
-  new_node->key = key;
   new_node->color = RBTREE_RED;
+  new_node->key = key;
+  new_node->parent = t->nil;
   new_node->left = t->nil;
   new_node->right = t->nil;
 
   node_t *current = t->root;
   node_t *parent = t->nil;
 
-  // BST에 따라 루트부터 신규 노드가 삽입될 위치를 찾습니다.
+  // 신규 노드 삽입될 위치 찾기
   while (current != t->nil) {
     parent = current;
     if (key < current->key) {
@@ -209,28 +213,26 @@ node_t *rbtree_insert(rbtree *t, const key_t key)
     } else if (key > current->key) {
       current = current->right;
     } else {
-      // 키가 중복되었을 경우
       current = current->right;
     }
   }
 
   // 신규 노드의 부모를 설정
-  new_node->parent = current;
-
-  if (parent == t->nil) { // 부모가 nil이면 신규 노드를 트리의 루트로 설정
+  new_node->parent = parent;
+  if (parent == t->nil) {
     t->root = new_node;
-  } else if (key < parent->key) { // 신규 노드의 키가 부모의 키보다 작으면 부모의 왼쪽 자식으로 설정
+  } else if (key < parent->key) {
     parent->left = new_node;
   } else if (key > parent->key) {
-    parent->right = new_node; // 신규 노드의 키가 부모의 키보다 작으면 부모의 오른쪽 자식으로 설정
+    parent->right = new_node;
   } else {
-    parent->right = new_node; // 중복 키라면 부모의 오른쪽 자식으로 설정
+    parent->right = new_node;
   }
 
   // RB Tree 특성 복구
   rbtree_insert_fixup(t, new_node);
 
-  return t->root;
+  return new_node;
 }
 
 node_t *rbtree_find(const rbtree *t, const key_t key)
