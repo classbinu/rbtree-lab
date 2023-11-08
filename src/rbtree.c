@@ -361,25 +361,26 @@ node_t *rbtree_max_in_subtree(rbtree *tree, node_t *node)
 }
 
 // 삭제할 노드의 서브트리를 삭제할 부모에 연결하는 함수입니다.(노드 삭제가 진행됩니다.)
-void rbtree_transplant(rbtree *tree, node_t *target_node, node_t *replaced_subtree)
+void rbtree_transplant(rbtree *tree, node_t *target_node, node_t *replaced_node)
 {
   if (!tree) {
     print_message(TREE_LOAD_FAILED);
     return;
   }
 
-  if (!target_node || !replaced_subtree) {
+  if (!target_node || !replaced_node) {
     print_message(NODE_LOAD_FAILED);
     return;
   }
 
-  if (target_node == tree->root) { // 삭제할 노드가 루트 노드라면 대체 서브트리의 루트를 전체 트리 루트로 설정합니다.
-    tree->root = replaced_subtree;
-  } else if (target_node == target_node->parent->left) {  // 삭제할 노드가 왼쪽 자식이라면
-    target_node->parent->left = replaced_subtree;         // 대체 서브트리를 왼쪽으로 연결합니다.
-  } else if (target_node == target_node->parent->right) { // 삭제할 노드가 오른쪽 자식이라면
-    target_node->parent->right = replaced_subtree;        // 대체 서브트리를 오른쪽으로 연결합니다.
+  if (target_node->parent == tree->nil) {
+    tree->root = replaced_node;
+  } else if (target_node == target_node->parent->left) {
+    target_node->parent->left = replaced_node;
+  } else {
+    target_node->parent->right = replaced_node;
   }
+  replaced_node->parent = target_node->parent;
 }
 
 // 트리에서 노드를 삭제한 후 레드블랙트리의 특성을 복구하는 함수입니다.
@@ -463,22 +464,24 @@ int rbtree_erase(rbtree *tree, node_t *target_node)
   }
 
   node_t *successor = target_node;
-  node_t *replacement_node;
+  node_t *replaced_node;
   color_t successor_original_color = successor->color;
 
   if (target_node->left == tree->nil) {                          // 삭제할 노드의 왼쪽 자식이 nil이면
-    replacement_node = target_node->right;                       // 오른쪽 자식을 대체 노드로 설정합니다.
+    replaced_node = target_node->right;                          // 오른쪽 자식을 대체 노드로 설정합니다.
     rbtree_transplant(tree, target_node, target_node->right);    // 노드를 삭제하고 부모-자식 관계를 재설정합니다.
   } else if (target_node->right == tree->nil) {                  // 삭제할 노드의 오른쪽 자식이 nil이면
-    replacement_node = target_node->left;                        // 왼쪽 자식을 대체 노드로 설정합니다.
+    replaced_node = target_node->left;                           // 왼쪽 자식을 대체 노드로 설정합니다.
     rbtree_transplant(tree, target_node, target_node->left);     // 노드를 삭제하고 부모-자식 관계를 재설정합니다.
   } else {                                                       // 삭제할 노드에 모두 자녀가 있으면
     successor = rbtree_min_in_subtree(tree, target_node->right); // 후계자를 선정합니다.
     successor_original_color = successor->color;                 // 후계자의 색상을 저장합니다.
-    replacement_node = successor->right;                         // 후계자가 기존 노드를 올라간 후 후계자의 자식을 저장합니다.
+    replaced_node = successor->right;                            // 후계자가 기존 노드를 올라간 후 후계자의 자식을 저장합니다.
 
-    if (successor->parent != target_node) {                 // 후계자가 바로 삭제할 노드를 대체하지 못하는 경우
-      rbtree_transplant(tree, successor, replacement_node); // 후계자의 위치를 대체 노드가 차지하게 됩니다.
+    if (successor->parent == target_node) {
+      replaced_node->parent = successor;
+    } else {                                             // 후계자가 바로 삭제할 노드를 대체하지 못하는 경우
+      rbtree_transplant(tree, successor, replaced_node); // 후계자의 위치를 대체 노드가 차지하게 됩니다.
       successor->right = target_node->right;
       successor->right->parent = successor;
     }
@@ -494,7 +497,7 @@ int rbtree_erase(rbtree *tree, node_t *target_node)
   target_node = NULL;
 
   if (successor_original_color == RBTREE_BLACK) {
-    rbtree_erase_fixup(tree, replacement_node);
+    rbtree_erase_fixup(tree, replaced_node);
   }
   return 1;
 }
