@@ -176,44 +176,44 @@ void right_rotate(rbtree *tree, node_t *x)
 }
 
 // 트리에 노드를 삽입한 후 레드블랙트리의 특성을 복구하는 함수입니다.
-void rbtree_insert_fixup(rbtree *tree, node_t *current_node)
+void rbtree_insert_fixup(rbtree *tree, node_t *new_node)
 {
   // 주목 노드가 레드인 경우에는 트리 재조정을 진행합니다.
-  while (current_node != tree->root && current_node->parent->color == RBTREE_RED) {
+  while (new_node != tree->root && new_node->parent->color == RBTREE_RED) {
     // case A. 현재 노드가 왼쪽 서브트리에 속한 경우입니다.(최종적으로 우회전 필요)
-    if (current_node->parent == current_node->parent->parent->left) {
-      node_t *uncle = current_node->parent->parent->right;
-      if (uncle->color == RBTREE_RED) {                    // case1: 삼촌이 레드인 경우
-        current_node->parent->color = RBTREE_BLACK;        // 부모 노드를 블랙으로 설정합니다.
-        uncle->color = RBTREE_BLACK;                       // 삼촌 노드를 블랙으로 설정합니다.
-        current_node->parent->parent->color = RBTREE_RED;  // 조부모를 레드로 설정합니다.(조부모가 부모, 삼촌에게 블랙을 물려줌.)
-        current_node = current_node->parent->parent;       // 블랙을 물려준 조부모를 주목 노드로 재설정합니다.
-      } else {                                             // case 2 & 3: 삼촌이 블랙인 경우
-        if (current_node == current_node->parent->right) { // case2: 삼촌이 블랙이고, 주목 노드가 오른쪽 자식인 경우(노드 꺾임)
-          current_node = current_node->parent;             // 부모 노드를 기준으로 설정하고,
-          left_rotate(tree, current_node);                 // 좌회전 해서 case3로 전환합니다.
+    if (new_node->parent == new_node->parent->parent->left) {
+      node_t *uncle = new_node->parent->parent->right;
+      if (uncle->color == RBTREE_RED) {               // case1: 삼촌이 레드인 경우
+        new_node->parent->color = RBTREE_BLACK;       // 부모 노드를 블랙으로 설정합니다.
+        uncle->color = RBTREE_BLACK;                  // 삼촌 노드를 블랙으로 설정합니다.
+        new_node->parent->parent->color = RBTREE_RED; // 조부모를 레드로 설정합니다.(조부모가 부모, 삼촌에게 블랙을 물려줍니다.)
+        new_node = new_node->parent->parent;          // 블랙을 물려준 조부모를 신규 노드로 재설정합니다.
+      } else {                                        // case 2 & 3: 삼촌이 블랙인 경우
+        if (new_node == new_node->parent->right) {    // case2: 삼촌이 블랙이고, 주목 노드가 오른쪽 자식인 경우(노드 꺾임)
+          new_node = new_node->parent;                // 부모 노드를 기준으로 설정하고,
+          left_rotate(tree, new_node);                // 좌회전 해서 case3로 전환합니다.
         }
         // case3: 삼촌이 블랙이고, 신규 노드가 왼쪽 자식인 경우(노드 직선)
-        current_node->parent->color = RBTREE_BLACK;
-        current_node->parent->parent->color = RBTREE_RED;
-        right_rotate(tree, current_node->parent->parent); // 조부모를 기준으로 우회전해서 전체 트리의 균형을 맞춥니다.
+        new_node->parent->color = RBTREE_BLACK;
+        new_node->parent->parent->color = RBTREE_RED;
+        right_rotate(tree, new_node->parent->parent); // 조부모를 기준으로 우회전해서 전체 트리의 균형을 맞춥니다.
       }
       // case B. 현재 노드가 오른쪽 서브트리에 속한 경우입니다.(최종적으로 좌회전 필요)
-    } else if (current_node->parent == current_node->parent->parent->right) {
-      node_t *uncle = current_node->parent->parent->left;
+    } else if (new_node->parent == new_node->parent->parent->right) {
+      node_t *uncle = new_node->parent->parent->left;
       if (uncle->color == RBTREE_RED) {
-        current_node->parent->color = RBTREE_BLACK;
+        new_node->parent->color = RBTREE_BLACK;
         uncle->color = RBTREE_BLACK;
-        current_node->parent->parent->color = RBTREE_RED;
-        current_node = current_node->parent->parent;
+        new_node->parent->parent->color = RBTREE_RED;
+        new_node = new_node->parent->parent;
       } else {
-        if (current_node == current_node->parent->left) {
-          current_node = current_node->parent;
-          right_rotate(tree, current_node);
+        if (new_node == new_node->parent->left) {
+          new_node = new_node->parent;
+          right_rotate(tree, new_node);
         }
-        current_node->parent->color = RBTREE_BLACK;
-        current_node->parent->parent->color = RBTREE_RED;
-        left_rotate(tree, current_node->parent->parent);
+        new_node->parent->color = RBTREE_BLACK;
+        new_node->parent->parent->color = RBTREE_RED;
+        left_rotate(tree, new_node->parent->parent);
       }
     }
   }
@@ -297,11 +297,11 @@ node_t *rbtree_min(const rbtree *tree)
     return NULL;
   }
 
-  node_t *current_node = tree->root;
-  while (current_node->left != tree->nil) {
-    current_node = current_node->left;
+  node_t *current = tree->root;
+  while (current->left != tree->nil) {
+    current = current->left;
   }
-  return current_node;
+  return current;
 }
 
 // 전체 트리에서 최댓값 노드를 반환하는 함수입니다.
@@ -311,11 +311,11 @@ node_t *rbtree_max(const rbtree *tree)
     return NULL;
   }
 
-  node_t *current_node = tree->root;
-  while (current_node->right != tree->nil) {
-    current_node = current_node->right;
+  node_t *current = tree->root;
+  while (current->right != tree->nil) {
+    current = current->right;
   }
-  return current_node;
+  return current;
 }
 
 // 특정 노드를 기준으로 최솟값 노드를 반환하는 함수입니다.
@@ -331,12 +331,12 @@ node_t *rbtree_min_in_subtree(rbtree *tree, node_t *node)
     return NULL;
   }
 
-  node_t *current_node = node;
-  while (current_node->left != tree->nil) {
-    current_node = current_node->left;
+  node_t *current = node;
+  while (current->left != tree->nil) {
+    current = current->left;
   }
 
-  return current_node;
+  return current;
 }
 
 // 특정 노드를 기준으로 최댓값 노드를 반환하는 함수입니다.
@@ -352,12 +352,12 @@ node_t *rbtree_max_in_subtree(rbtree *tree, node_t *node)
     return NULL;
   }
 
-  node_t *current_node = node;
-  while (current_node->right != tree->nil) {
-    current_node = current_node->right;
+  node_t *current = node;
+  while (current->right != tree->nil) {
+    current = current->right;
   }
 
-  return current_node;
+  return current;
 }
 
 // 삭제할 노드의 서브트리를 삭제할 부모에 연결하는 함수입니다.(노드 삭제가 진행됩니다.)
@@ -384,70 +384,70 @@ void rbtree_transplant(rbtree *tree, node_t *target_node, node_t *replaced_node)
 }
 
 // 트리에서 노드를 삭제한 후 레드블랙트리의 특성을 복구하는 함수입니다.
-void rbtree_erase_fixup(rbtree *tree, node_t *current_node)
+void rbtree_erase_fixup(rbtree *tree, node_t *replaced_node)
 {
   node_t *sibling;
 
-  while (current_node != tree->root && current_node->color == RBTREE_BLACK) {
-    if (current_node == current_node->parent->left) { // case A. 주목 노드가 왼쪽 자식인 경우
-      sibling = current_node->parent->right;
+  while (replaced_node != tree->root && replaced_node->color == RBTREE_BLACK) {
+    if (replaced_node == replaced_node->parent->left) { // case A. 주목 노드가 왼쪽 자식인 경우
+      sibling = replaced_node->parent->right;
 
       // case 1. 형제 노드가 레드인 경우
       if (sibling->color == RBTREE_RED) {
         sibling->color = RBTREE_BLACK; // 좌회전을 대비해서 형제 노드와 부모 노드의 색을 교환합니다.
-        current_node->parent->color = RBTREE_RED;
-        left_rotate(tree, current_node->parent);
-        sibling = current_node->parent->right; // 새로운 형제노드를 설정해서 case 2~4로 변환합니다.
+        replaced_node->parent->color = RBTREE_RED;
+        left_rotate(tree, replaced_node->parent);
+        sibling = replaced_node->parent->right; // 새로운 형제노드를 설정해서 case 2~4로 변환합니다.
       }
 
       // case 2. (형제 노드는 블랙) 형제 노드의 두 자식이 모두 블랙인 경우
       if (sibling->left->color == RBTREE_BLACK && sibling->right->color == RBTREE_BLACK) {
         sibling->color = RBTREE_RED;
-        current_node = current_node->parent;                                                    // 만약 주목 노드가 루트 노드이거나, 블랙이면 조정이 완료됩니다.
+        replaced_node = replaced_node->parent;                                                  // 만약 주목 노드가 루트 노드이거나, 블랙이면 조정이 완료됩니다.
       } else if (sibling->left->color == RBTREE_RED && sibling->right->color == RBTREE_BLACK) { // case 3. (형제 노드는 블랙) 형제 노드의 왼쪽 자식은 레드, 오른쪽 자식은 블랙인 경우
         sibling->left->color = RBTREE_BLACK;
         sibling->color = RBTREE_RED;
         right_rotate(tree, sibling);
-        sibling = current_node->parent->right; // 새로운 형제가 설정되고, case 4로 변환됩니다.
+        sibling = replaced_node->parent->right; // 새로운 형제가 설정되고, case 4로 변환됩니다.
       }
 
       // case 4. case2의 일부를 제외하고 모든 case는 case4로 귀결됩니다.
-      sibling->color = current_node->parent->color;
-      current_node->parent->color = RBTREE_BLACK;
+      sibling->color = replaced_node->parent->color;
+      replaced_node->parent->color = RBTREE_BLACK;
       sibling->right->color = RBTREE_BLACK;
-      left_rotate(tree, current_node->parent);
-      current_node = tree->root;
+      left_rotate(tree, replaced_node->parent);
+      replaced_node = tree->root;
     } else { // case B. 주목 노드가 오른쪽 자식인 경우
-      sibling = current_node->parent->left;
+      sibling = replaced_node->parent->left;
 
       // case 1. 형제 노드가 레드인 경우
       if (sibling->color == RBTREE_RED) {
         sibling->color = RBTREE_BLACK; // 좌회전을 대비해서 형제 노드와 부모 노드의 색을 교환합니다.
-        current_node->parent->color = RBTREE_RED;
-        right_rotate(tree, current_node->parent);
-        sibling = current_node->parent->left; // 새로운 형제노드를 설정해서 case 2~4로 변환합니다.
+        replaced_node->parent->color = RBTREE_RED;
+        right_rotate(tree, replaced_node->parent);
+        sibling = replaced_node->parent->left; // 새로운 형제노드를 설정해서 case 2~4로 변환합니다.
       }
 
       // case 2. (형제 노드는 블랙) 형제 노드의 두 자식이 모두 블랙인 경우
       if (sibling->right->color == RBTREE_BLACK && sibling->left->color == RBTREE_BLACK) {
         sibling->color = RBTREE_RED;
-        current_node = current_node->parent;                                                      // 만약 주목 노드가 루트 노드이거나, 블랙이면 조정이 완료됩니다.
+        replaced_node = replaced_node->parent;                                                    // 만약 주목 노드가 루트 노드이거나, 블랙이면 조정이 완료됩니다.
       } else if (sibling->left->color == RBTREE_BLACK && sibling->right->color == RBTREE_BLACK) { // case 3. (형제 노드는 블랙) 형제 노드의 왼쪽 자식은 레드, 오른쪽 자식은 블랙인 경우
         sibling->left->color = RBTREE_BLACK;
         sibling->color = RBTREE_RED;
         left_rotate(tree, sibling);
-        sibling = current_node->parent->left; // 새로운 형제가 설정되고, case 4로 변환됩니다.
+        sibling = replaced_node->parent->left; // 새로운 형제가 설정되고, case 4로 변환됩니다.
       }
 
       // case 4. case2의 일부를 제외하고 모든 case는 case4로 귀결됩니다.
-      sibling->color = current_node->parent->color;
-      current_node->parent->color = RBTREE_BLACK;
+      sibling->color = replaced_node->parent->color;
+      replaced_node->parent->color = RBTREE_BLACK;
       sibling->left->color = RBTREE_BLACK;
-      right_rotate(tree, current_node->parent);
-      current_node = tree->root;
+      right_rotate(tree, replaced_node->parent);
+      replaced_node = tree->root;
     }
   }
-  current_node->color = RBTREE_BLACK;
+  replaced_node->color = RBTREE_BLACK;
 }
 
 // 트리에서 특정 노드를 삭제하는 함수입니다.
