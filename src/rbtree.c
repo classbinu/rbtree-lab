@@ -10,8 +10,6 @@ typedef enum
   NODE_GENERATE_FAILED,
   TREE_LOAD_FAILED,
   NODE_LOAD_FAILED,
-  LEFT_ROTATE_FAILED,
-  RIGHT_ROTATE_FAILED,
   ETC
 } message_t;
 
@@ -27,12 +25,6 @@ void print_message(message_t type)
     break;
   case NODE_LOAD_FAILED:
     printf("노드를 불러올 수 없습니다.\n");
-    break;
-  case LEFT_ROTATE_FAILED:
-    printf("좌회전에 실패하였습니다.\n");
-    break;
-  case RIGHT_ROTATE_FAILED:
-    printf("우회전에 실패하였습니다.\n");
     break;
   case TREE_GENERATE_FAILED:
     printf("트리 생성에 실패하였습니다.\n");
@@ -122,9 +114,8 @@ void delete_rbtree(rbtree *tree)
 // 좌회전 함수입니다.
 void left_rotate(rbtree *tree, node_t *x)
 {
-  // 중심 노드 또는 오른쪽 자식이 nil이면 좌회전이 불가능합니다.
+  // 중심 노드 또는 오른쪽 자식이 nil이면 좌회전을 하지 않습니다.
   if (x == tree->nil || x->right == tree->nil) {
-    print_message(LEFT_ROTATE_FAILED);
     return;
   }
 
@@ -155,9 +146,8 @@ void left_rotate(rbtree *tree, node_t *x)
 // 우회전 함수입니다.
 void right_rotate(rbtree *tree, node_t *x)
 {
-  // 중심 노드 또는 왼쪽 자식이 nil이면 우회전이 불가능합니다.
+  // 중심 노드 또는 왼쪽 자식이 nil이면 우회전이 하지 않습니다.
   if (x == tree->nil || x->left == tree->nil) {
-    print_message(RIGHT_ROTATE_FAILED);
     return;
   }
 
@@ -304,7 +294,6 @@ node_t *rbtree_find(const rbtree *tree, const key_t key)
 node_t *rbtree_min(const rbtree *tree)
 {
   if (!tree) {
-    print_message(TREE_LOAD_FAILED);
     return NULL;
   }
 
@@ -319,7 +308,6 @@ node_t *rbtree_min(const rbtree *tree)
 node_t *rbtree_max(const rbtree *tree)
 {
   if (!tree) {
-    print_message(TREE_LOAD_FAILED);
     return NULL;
   }
 
