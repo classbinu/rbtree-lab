@@ -442,7 +442,7 @@ void rbtree_erase_fixup(rbtree *tree, node_t *current_node)
       // case 2. (형제 노드는 블랙) 형제 노드의 두 자식이 모두 블랙인 경우
       if (sibling->right->color == RBTREE_BLACK && sibling->left->color == RBTREE_BLACK) {
         sibling->color = RBTREE_RED;
-        current_node = current_node->parent;                                                    // 만약 주목 노드가 루트 노드이거나, 블랙이면 조정이 완료됩니다.
+        current_node = current_node->parent;                                                      // 만약 주목 노드가 루트 노드이거나, 블랙이면 조정이 완료됩니다.
       } else if (sibling->left->color == RBTREE_BLACK && sibling->right->color == RBTREE_BLACK) { // case 3. (형제 노드는 블랙) 형제 노드의 왼쪽 자식은 레드, 오른쪽 자식은 블랙인 경우
         sibling->left->color = RBTREE_BLACK;
         sibling->color = RBTREE_RED;
