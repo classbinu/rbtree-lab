@@ -298,7 +298,7 @@ node_t *rbtree_min(const rbtree *tree)
   }
 
   node_t *current_node = tree->root;
-  while (current_node != tree->nil) {
+  while (current_node->left != tree->nil) {
     current_node = current_node->left;
   }
   return current_node;
@@ -312,7 +312,7 @@ node_t *rbtree_max(const rbtree *tree)
   }
 
   node_t *current_node = tree->root;
-  while (current_node != tree->nil) {
+  while (current_node->right != tree->nil) {
     current_node = current_node->right;
   }
   return current_node;
@@ -332,7 +332,7 @@ node_t *rbtree_min_in_subtree(rbtree *tree, node_t *node)
   }
 
   node_t *current_node = node;
-  while (current_node != tree->nil) {
+  while (current_node->left != tree->nil) {
     current_node = current_node->left;
   }
 
@@ -353,7 +353,7 @@ node_t *rbtree_max_in_subtree(rbtree *tree, node_t *node)
   }
 
   node_t *current_node = node;
-  while (current_node != tree->nil) {
+  while (current_node->right != tree->nil) {
     current_node = current_node->right;
   }
 
