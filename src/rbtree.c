@@ -105,7 +105,7 @@ void delete_rbtree(rbtree *tree)
 
   // 트리 안의 노드를 삭제하기 위한 스택을 생성합니다.
   // node_t **stack = (node_t **)calloc(height, sizeof(node_t *));
-  node_t *stack[1024];
+  node_t *stack[10240];
   int stack_top = 0;
 
   // 루트 노드가 존재하면 노드 탐색을 시작합니다.
