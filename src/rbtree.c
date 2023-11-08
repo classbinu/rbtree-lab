@@ -372,44 +372,46 @@ void rbtree_erase_fixup(rbtree *t, node_t *x)
 // 이진 검색 트리 방식으로 삭제
 int rbtree_erase(rbtree *t, node_t *z)
 {
-  // if (z == NULL || z == t->nil) {
-  //   return -1;
-  // }
+  if (z == NULL || z == t->nil) {
+    return -1;
+  }
 
-  node_t *y = z;
-  node_t *x; // x는 삭제 연산으로 인해 부모 노드를 잃게 된 고아 노드
-  color_t y_original_color = y->color;
+  node_t *successor = z;
+  node_t *replacement; // x는 삭제 연산으로 인해 부모 노드를 잃게 된 노드
+  color_t successor_original_color = successor->color;
 
-  if (z->left == t->nil) { // 삭제할 노드의 왼쪽 자녀가 nil
-    x = z->right;          // 삭제 과정에서 새롭게 올라온 노드를 기준으로 트리를 재조정함.
+  if (z->left == t->nil) {  // 삭제할 노드의 왼쪽 자녀가 nil
+    replacement = z->right; // 삭제 과정에서 새롭게 올라온 노드를 기준으로 트리를 재조정함.
     rbtree_transplant(t, z, z->right);
   } else if (z->right == t->nil) { // 삭제할 노드의 오른쪽 자녀가 nil
-    x = z->left;                   // 삭제 과정에서 새롭게 올라온 노드를 기준으로 트리를 재조정함.
+    replacement = z->left;         // 삭제 과정에서 새롭게 올라온 노드를 기준으로 트리를 재조정함.
     rbtree_transplant(t, z, z->left);
-  } else {                                  // 삭제한 노드에 모두 자녀가 있음
-    y = rbtree_min_in_subtree(t, z->right); // 후계자 찾기
-    y_original_color = y->color;
-    x = y->right;                        // y의 왼쪽 자식은 무조건 nil이지만 오른쪽은 서브트리 존재 가능함
-    if (y->parent == z) {                // 후계자가 삭제 노드의 직접 자식이라면, y는 이미 올바른 위치(y는 언제든지 떠날 준비가 되어 있음.)
-      x->parent = y;                     // x는 임시 변수로, y의 오른쪽 자녀로 등록되었지만, x의 부모가 누군인지는 아직 모름. 이 시점에서 연동.
-    } else {                             // y가 z를 대체하기 위해서는 y의 관계를 y의 오른쪽 자식에게 물려주고 떠나야 함.
-      rbtree_transplant(t, y, y->right); // y를 y의 오른쪽 자식으로 대체
-      y->right = z->right;
-      y->right->parent = y;
+  } else {                                          // 삭제한 노드에 모두 자녀가 있음
+    successor = rbtree_min_in_subtree(t, z->right); // 후계자 찾기
+    successor_original_color = successor->color;
+    replacement = successor->right; // y의 왼쪽 자식은 무조건 nil이지만 오른쪽은 서브트리 존재 가능함
+
+    if (successor->parent == z) {                        // 후계자가 삭제 노드의 직접 자식이라면, y는 이미 올바른 위치(y는 언제든지 떠날 준비가 되어 있음.)
+      replacement->parent = successor;                   // x는 임시 변수로, y의 오른쪽 자녀로 등록되었지만, x의 부모가 누군인지는 아직 모름. 이 시점에서 연동.
+    } else {                                             // y가 z를 대체하기 위해서는 y의 관계를 y의 오른쪽 자식에게 물려주고 떠나야 함.
+      rbtree_transplant(t, successor, successor->right); // y를 y의 오른쪽 자식으로 대체
+      successor->right = z->right;
+      successor->right->parent = successor;
     }
 
     // z를 삭제(y로 대체)하고 기존 z의 왼쪽 자식의 관계를 y의 관계로 재설정
-    rbtree_transplant(t, z, y);
-    y->left = z->left;
-    y->left->parent = y;
-    y->color = z->color;
+    rbtree_transplant(t, z, successor);
+    successor->left = z->left;
+    successor->left->parent = successor;
+    successor->color = z->color;
   }
 
   free(z);
   z = NULL;
 
-  if (y_original_color == RBTREE_BLACK) {
-    rbtree_erase_fixup(t, x);
+  // 이 부분이 더블블랙을 해소하는 부분.
+  if (successor_original_color == RBTREE_BLACK) {
+    rbtree_erase_fixup(t, replacement);
   }
   return 1;
 }
