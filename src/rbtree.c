@@ -100,12 +100,12 @@ void delete_rbtree(rbtree *tree)
   }
 
   // 트리의 높이를 계산합니다.
-  // int height = rbtree_height(tree, tree->root);
+  int height = rbtree_height(tree, tree->root);
   // int height = 2;  // 메모리 동적 할당 실험용 임시 코드입니다.
 
   // 트리 안의 노드를 삭제하기 위한 스택을 생성합니다.
-  // node_t **stack = (node_t **)calloc(height, sizeof(node_t *));
-  node_t *stack[10240];
+  node_t **stack = (node_t **)calloc(height, sizeof(node_t *));
+  // node_t *stack[1024]; // 메모리 정적 할당 실험용 임시 코드입니다.
   int stack_top = 0;
 
   // 루트 노드가 존재하면 노드 탐색을 시작합니다.
@@ -133,7 +133,7 @@ void delete_rbtree(rbtree *tree)
   // 트리 내의 모든 노드를 삭제 후 최종적으로 nil노드와 트리, 스택을 삭제합니다.
   free(tree->nil);
   free(tree);
-  // free(stack);
+  free(stack);
 }
 
 // 좌회전 함수입니다.
