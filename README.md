@@ -1,4 +1,4 @@
-# Red Balck Tree
+# Red Balck Tree
 
 ## 학습 목표
 1. 복잡한 자료구조를 직접 구현한다.
