@@ -15,4 +15,4 @@
 4. 시간 복잡도 O(lon n)의 위대함을 알게 됨.
 
 ## 참고 포스팅
-[[크래프톤 정글 3기] 11/7(화) TIL]([https://velog.io/@classbinu/%ED%81%AC%EB%9E%98%ED%94%84%ED%86%A4-%EC%A0%95%EA%B8%80-3%EA%B8%B0-1115%EC%88%98-TIL](https://velog.io/@classbinu/%ED%81%AC%EB%9E%98%ED%94%84%ED%86%A4-%EC%A0%95%EA%B8%80-3%EA%B8%B0-117%ED%99%94-TIL)https://velog.io/@classbinu/%ED%81%AC%EB%9E%98%ED%94%84%ED%86%A4-%EC%A0%95%EA%B8%80-3%EA%B8%B0-117%ED%99%94-TIL)
+[[크래프톤 정글 3기] 11/7(화) TIL](https://velog.io/@classbinu/%ED%81%AC%EB%9E%98%ED%94%84%ED%86%A4-%EC%A0%95%EA%B8%80-3%EA%B8%B0-117%ED%99%94-TIL)
